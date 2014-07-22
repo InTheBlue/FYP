@@ -103,24 +103,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named TestProgram
+# Target rules for targets named TestProgram.exe
 
 # Build rule for target.
-TestProgram: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 TestProgram
-.PHONY : TestProgram
+TestProgram.exe: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 TestProgram.exe
+.PHONY : TestProgram.exe
 
 # fast build rule for target.
-TestProgram/fast:
-	$(MAKE) -f CMakeFiles/TestProgram.dir/build.make CMakeFiles/TestProgram.dir/build
-.PHONY : TestProgram/fast
+TestProgram.exe/fast:
+	$(MAKE) -f CMakeFiles/TestProgram.exe.dir/build.make CMakeFiles/TestProgram.exe.dir/build
+.PHONY : TestProgram.exe/fast
 
 TestProgram.o: TestProgram.cpp.o
 .PHONY : TestProgram.o
 
 # target to build an object file
 TestProgram.cpp.o:
-	$(MAKE) -f CMakeFiles/TestProgram.dir/build.make CMakeFiles/TestProgram.dir/TestProgram.cpp.o
+	$(MAKE) -f CMakeFiles/TestProgram.exe.dir/build.make CMakeFiles/TestProgram.exe.dir/TestProgram.cpp.o
 .PHONY : TestProgram.cpp.o
 
 TestProgram.i: TestProgram.cpp.i
@@ -128,7 +128,7 @@ TestProgram.i: TestProgram.cpp.i
 
 # target to preprocess a source file
 TestProgram.cpp.i:
-	$(MAKE) -f CMakeFiles/TestProgram.dir/build.make CMakeFiles/TestProgram.dir/TestProgram.cpp.i
+	$(MAKE) -f CMakeFiles/TestProgram.exe.dir/build.make CMakeFiles/TestProgram.exe.dir/TestProgram.cpp.i
 .PHONY : TestProgram.cpp.i
 
 TestProgram.s: TestProgram.cpp.s
@@ -136,7 +136,7 @@ TestProgram.s: TestProgram.cpp.s
 
 # target to generate assembly for a file
 TestProgram.cpp.s:
-	$(MAKE) -f CMakeFiles/TestProgram.dir/build.make CMakeFiles/TestProgram.dir/TestProgram.cpp.s
+	$(MAKE) -f CMakeFiles/TestProgram.exe.dir/build.make CMakeFiles/TestProgram.exe.dir/TestProgram.cpp.s
 .PHONY : TestProgram.cpp.s
 
 # Help Target
@@ -145,7 +145,7 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... TestProgram"
+	@echo "... TestProgram.exe"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... TestProgram.o"

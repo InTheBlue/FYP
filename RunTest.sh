@@ -8,7 +8,7 @@ printf "Git Hash: %s\n" $ver
 count=5
 total=0
 for ((i=1;i<=count;i++)); do
-	output=$(./TestProgram)
+	output=$(./TestProgram.exe)
 	printf "Run %d: %s\n" $i $output
 	total=$(echo $total+$output | bc)
 done
