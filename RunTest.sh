@@ -12,6 +12,8 @@ for ((i=1;i<=count;i++)); do
 	printf "Run %d: %s\n" $i $output
 	total=$(echo $total+$output | bc)
 done
-avg=$(echo "scale=6; $total / $count" | bc)
+avg=$(echo "scale=3; $total / $count" | bc)
+echo "Total: $total"
 echo "Avg: $avg"
 exec 1>&6 6>&-
+cat $logfile
