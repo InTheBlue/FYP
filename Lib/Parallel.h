@@ -6,8 +6,8 @@
 #include <vector>
 namespace Parallel
 {
-	template<typename IndexType, typename Func>
-	void For(IndexType Start, IndexType End, Func F)
+	template<typename IndexType, typename Container, typename Func>
+	void For(IndexType Start, IndexType End, const Container Input, Func F)
 	{
 		std::vector<std::thread> Workers;
 		std::queue<std::function<void()>> Tasks;
@@ -23,7 +23,10 @@ namespace Parallel
 		
 		for(;Start < End; Start++)
 		{
-			Tasks.push([F, Start]{F(Start);});
+			auto in = Input[Start];
+			Tasks.push([=]{
+				F(in);
+			});
 		}
 		
 		for(size_t i = 0; i < ThreadCount; i++)
