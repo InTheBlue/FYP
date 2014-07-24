@@ -10,7 +10,6 @@ using namespace std;
 #include "cryptopp/base64.h"
 
 #include "Lib/Parallel.h"
-#define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_MSG(str) do { std::cout << str << std::endl; } while( false )
@@ -46,7 +45,6 @@ int main( int, char** ) {
 	DEBUG_MSG("Starting parallel foreach work");
 	Parallel::Foreach(work.begin(), work.end(), doWork);
 	chrono::steady_clock::time_point t3 = chrono::steady_clock::now();	
-	DEBUG_MSG("Finishing parallel foreach work");
 	DEBUG_MSG("Starting parallel for work");
 	size_t start = 0;
 	size_t end = work.size();
