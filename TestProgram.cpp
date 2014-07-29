@@ -10,7 +10,6 @@ using namespace std;
 #include "cryptopp/base64.h"
 
 #include "Lib/Parallel.h"
-#define DEBUG
 
 #ifdef DEBUG
 #define DEBUG_MSG(str) do { std::cout << str << std::endl; } while( false )
@@ -43,12 +42,17 @@ int main( int, char** ) {
 		doWork(*(it));
 	}
 	chrono::steady_clock::time_point t2 = chrono::steady_clock::now();
-	DEBUG_MSG("Starting parallel work");
+	DEBUG_MSG("Starting parallel foreach work");
 	Parallel::Foreach(work.begin(), work.end(), doWork);
 	chrono::steady_clock::time_point t3 = chrono::steady_clock::now();	
-	DEBUG_MSG("Finishing parallel work");
+	DEBUG_MSG("Starting parallel for work");
+	size_t start = 0;
+	size_t end = work.size();
+	Parallel::For(start, end, work, doWork);
+	chrono::steady_clock::time_point t4 = chrono::steady_clock::now(); 
 	chrono::duration<double> ElapsedSerial = chrono::duration_cast<chrono::duration<double>>(t2-t1);
-	chrono::duration<double> ElapsedParallel = chrono::duration_cast<chrono::duration<double>>(t3-t2);
-	cout << ElapsedSerial.count() << "\t" << ElapsedParallel.count() << endl;
+	chrono::duration<double> ElapsedParallelForEach = chrono::duration_cast<chrono::duration<double>>(t3-t2);
+	chrono::duration<double> ElapsedParallelFor = chrono::duration_cast<chrono::duration<double>>(t4-t3);
+	cout << ElapsedSerial.count() << "\t" << ElapsedParallelForEach.count() << "\t" << ElapsedParallelFor.count() << endl;
 	return 0;
 }
