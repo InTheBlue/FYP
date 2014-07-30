@@ -35,7 +35,7 @@ namespace Parallel
 					}
 					if(!Tasks.Empty())
 					{
-						f = Tasks.PopFront();
+						f = Tasks.TryPopFront();
 					}
 					try
 					{
@@ -93,7 +93,7 @@ namespace Parallel
 					}
 					if(!Tasks.Empty())
 					{
-						f = Tasks.PopFront();
+						f = Tasks.TryPopFront();
 					}
 					try
 					{

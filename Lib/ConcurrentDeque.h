@@ -25,10 +25,10 @@ namespace Parallel
 	template<typename T>
 	void concurrent_deque<T>::PushBack(T Value)
 	{
-		std::unique_lock<std::mutex> lock(_backMutex);
-		lock.lock();
-		_deque.push_back(Value);
-		lock.unlock();
+		{
+			std::lock_guard<std::mutex> lock(_backMutex);
+			_deque.push_back(Value);
+		}
 		_emptyCondition.notify_one();
 	}
 
@@ -37,35 +37,31 @@ namespace Parallel
 	{
 		std::unique_lock<std::mutex> lock(_frontMutex);
 		_emptyCondition.wait(lock, [this]{return !Empty();});
-		lock.lock();
 		T ret = _deque.front();
 		_deque.pop_front();
-		lock.unlock();
 		return ret;
 	}
 
 	template<typename T>
 	T concurrent_deque<T>::TryPopFront()
 	{
-		std::unique_lock<std::mutex> lock(_frontMutex);
+		std::lock_guard<std::mutex> lock(_frontMutex);
 		if(Empty())
 		{
 			return T();
 		}
-		lock.lock();
 		T ret = _deque.front();
 		_deque.pop_front();
-		lock.unlock();
 		return ret;		
 	}
 	
 	template<typename T>
 	void concurrent_deque<T>::PushFront(T Value)
 	{
-		std::unique_lock<std::mutex> lock(_frontMutex);
-		lock.lock();
-		_deque.push_front(Value);
-		lock.unlock();
+		{
+			std::lock_guard<std::mutex> lock(_frontMutex);
+			_deque.push_front(Value);
+		}
 		_emptyCondition.notify_one();
 	}
 
@@ -74,25 +70,21 @@ namespace Parallel
 	{
 		std::unique_lock<std::mutex> lock(_backMutex);
 		_emptyCondition.wait(lock, [this]{return !Empty();});
-		lock.lock();
 		T ret = _deque.back();
 		_deque.pop_back();
-		lock.unlock();
 		return ret;
 	}
 
 	template<typename T>
 	T concurrent_deque<T>::TryPopBack()
 	{
-		std::unique_lock<std::mutex> lock(_backMutex);
+		std::lock_guard<std::mutex> lock(_backMutex);
 		if(Empty())
 		{
 			return T();
 		}
-		lock.lock();
 		T ret = _deque.back();
 		_deque.back_front();
-		lock.unlock();
 		return ret;		
 	}
 
