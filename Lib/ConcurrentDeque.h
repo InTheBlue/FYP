@@ -1,0 +1,104 @@
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+#include <functional>
+
+namespace Parallel
+{
+	template<typename T>
+	class concurrent_deque
+	{
+		std::deque<T> _deque;
+		mutable std::mutex _backMutex;
+		mutable std::mutex _frontMutex;
+		std::condition_variable _emptyCondition;
+	public:
+		void PushBack(T Value);
+		T PopFront();
+		T TryPopFront();
+		void PushFront(T Value);
+		T PopBack();
+		T TryPopBack();
+		bool Empty() const;
+	};
+
+	template<typename T>
+	void concurrent_deque<T>::PushBack(T Value)
+	{
+		std::unique_lock<std::mutex> lock(_backMutex);
+		lock.lock();
+		_deque.push_back(Value);
+		lock.unlock();
+		_emptyCondition.notify_one();
+	}
+
+	template<typename T>
+	T concurrent_deque<T>::PopFront()
+	{
+		std::unique_lock<std::mutex> lock(_frontMutex);
+		_emptyCondition.wait(lock, [this]{return !Empty();});
+		lock.lock();
+		T ret = _deque.front();
+		_deque.pop_front();
+		lock.unlock();
+		return ret;
+	}
+
+	template<typename T>
+	T concurrent_deque<T>::TryPopFront()
+	{
+		std::unique_lock<std::mutex> lock(_frontMutex);
+		if(Empty())
+		{
+			return T();
+		}
+		lock.lock();
+		T ret = _deque.front();
+		_deque.pop_front();
+		lock.unlock();
+		return ret;		
+	}
+	
+	template<typename T>
+	void concurrent_deque<T>::PushFront(T Value)
+	{
+		std::unique_lock<std::mutex> lock(_frontMutex);
+		lock.lock();
+		_deque.push_front(Value);
+		lock.unlock();
+		_emptyCondition.notify_one();
+	}
+
+	template<typename T>
+	T concurrent_deque<T>::PopBack()
+	{
+		std::unique_lock<std::mutex> lock(_backMutex);
+		_emptyCondition.wait(lock, [this]{return !Empty();});
+		lock.lock();
+		T ret = _deque.back();
+		_deque.pop_back();
+		lock.unlock();
+		return ret;
+	}
+
+	template<typename T>
+	T concurrent_deque<T>::TryPopBack()
+	{
+		std::unique_lock<std::mutex> lock(_backMutex);
+		if(Empty())
+		{
+			return T();
+		}
+		lock.lock();
+		T ret = _deque.back();
+		_deque.back_front();
+		lock.unlock();
+		return ret;		
+	}
+
+	template<typename T>
+	bool concurrent_deque<T>::Empty() const
+	{
+		return _deque.empty();
+	}
+}
