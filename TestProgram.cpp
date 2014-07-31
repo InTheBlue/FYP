@@ -17,7 +17,7 @@ using namespace std;
 #define DEBUG_MSG(str) do { } while ( false )
 #endif
 
-void doWork(string count)
+string doWork(string count)
 {
 	CryptoPP::SHA512 hash;
 	string digest;
@@ -25,6 +25,7 @@ void doWork(string count)
 	oss << "Testing" << count;
 	string msg = oss.str();
 	CryptoPP::StringSource s(msg, true, new CryptoPP::HashFilter(hash, new CryptoPP::Base64Encoder( new CryptoPP::StringSink(digest))));
+	return digest;
 }
 int main( int, char** ) {
 	DEBUG_MSG("Setup");
@@ -49,10 +50,14 @@ int main( int, char** ) {
 	size_t start = 0;
 	size_t end = work.size();
 	Parallel::For(start, end, work, doWork);
-	chrono::steady_clock::time_point t4 = chrono::steady_clock::now(); 
+	chrono::steady_clock::time_point t4 = chrono::steady_clock::now();
+	DEBUG_MSG("Starting parallel map work"); 
+	auto output = Parallel::Map(work.begin(), work.end(), doWork);
+	chrono::steady_clock::time_point t5 = chrono::steady_clock::now();
 	chrono::duration<double> ElapsedSerial = chrono::duration_cast<chrono::duration<double>>(t2-t1);
 	chrono::duration<double> ElapsedParallelForEach = chrono::duration_cast<chrono::duration<double>>(t3-t2);
 	chrono::duration<double> ElapsedParallelFor = chrono::duration_cast<chrono::duration<double>>(t4-t3);
-	cout << ElapsedSerial.count() << "\t" << ElapsedParallelForEach.count() << "\t" << ElapsedParallelFor.count() << endl;
+	chrono::duration<double> ElapsedParallelMap = chrono::duration_cast<chrono::duration<double>>(t5-t4);
+	cout << ElapsedSerial.count() << "\t" << ElapsedParallelForEach.count() << "\t" << ElapsedParallelFor.count() << "\t" << ElapsedParallelMap.count() << endl;
 	return 0;
 }
