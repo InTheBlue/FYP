@@ -54,10 +54,14 @@ int main( int, char** ) {
 	DEBUG_MSG("Starting parallel map work"); 
 	auto output = Parallel::Map(work.begin(), work.end(), doWork);
 	chrono::steady_clock::time_point t5 = chrono::steady_clock::now();
+	DEBUG_MSG("Starting parallel for chunked work");
+	Parallel::For(start, end, work, doWork);
+	chrono::steady_clock::time_point t6 = chrono::steady_clock::now();
 	chrono::duration<double> ElapsedSerial = chrono::duration_cast<chrono::duration<double>>(t2-t1);
 	chrono::duration<double> ElapsedParallelForEach = chrono::duration_cast<chrono::duration<double>>(t3-t2);
 	chrono::duration<double> ElapsedParallelFor = chrono::duration_cast<chrono::duration<double>>(t4-t3);
 	chrono::duration<double> ElapsedParallelMap = chrono::duration_cast<chrono::duration<double>>(t5-t4);
-	cout << ElapsedSerial.count() << "\t" << ElapsedParallelForEach.count() << "\t" << ElapsedParallelFor.count() << "\t" << ElapsedParallelMap.count() << endl;
+	chrono::duration<double> ElapsedParallelForChunks = chrono::duration_cast<chrono::duration<double>>(t6-t5);
+	cout << ElapsedSerial.count() << "\t" << ElapsedParallelForEach.count() << "\t" << ElapsedParallelFor.count() << "\t" << ElapsedParallelMap.count() << "\t" << ElapsedParallelForChunks.count() <<endl;
 	return 0;
 }
