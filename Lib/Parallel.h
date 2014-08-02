@@ -259,10 +259,10 @@ namespace Parallel
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
 			Workers.push_back(std::thread([&]{
+				std::deque<std::function<void()>> work;
+				std::function<void()> f;
 				while(true)
 				{
-					std::deque<std::function<void()>> work;
-					std::function<void()> f;
 					if(Tasks.Empty() && joinWhenEmpty)
 					{
 						return;
