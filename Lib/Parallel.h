@@ -263,7 +263,7 @@ namespace Parallel
 				{
 					std::deque<std::function<void()>> work;
 					std::function<void()> f;
-					if(Tasks.empty() && joinWhenEmpty)
+					if(Tasks.Empty() && joinWhenEmpty)
 					{
 						return;
 					}
