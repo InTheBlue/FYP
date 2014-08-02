@@ -188,12 +188,7 @@ namespace Parallel
 	}
 
 	template<typename IndexType, typename Container, typename Func>
-	void ForChunking(IndexType Start, IndexType End, const Container Input, Func F)
-	{
-		ForChunking(Start, End, Input, F, 4);
-	}
-	template<typename IndexType, typename Container, typename Func>
-	void ForChunking(IndexType Start, IndexType End, const Container Input, Func F, size_t grainSize)
+	void ForChunking(IndexType Start, IndexType End, const Container Input, Func F, size_t grainSize = 4)
 	{
 		std::vector<std::thread> Workers;
 		concurrent_deque<std::deque<std::function<void()>>> Tasks;
@@ -207,20 +202,20 @@ namespace Parallel
 			ThreadCount = 1;
 		}
 		std::vector<std::deque<std::function<void()>>> TaskChunks;
-		for(int i = 0; i < ThreadCount * grainSize; i++)
+		for(size_t i = 0; i < ThreadCount * grainSize; i++)
 		{
 			std::deque<std::function<void()>> d;
 			TaskChunks.push_back(d);
 		}
 		for(;Start < End; Start+=grainSize)
 		{
-			for(int i = Start; i < Start + grainSize; i++)
+			for(size_t i = Start; i < Start + grainSize; i++)
 			{
 				try
 				{
 					auto in = Input.at(i);
 					TaskChunks[i].push_back([=]{
-						F(i);
+						F(in);
 					});
 				}
 				catch(exception e)
