@@ -54,8 +54,8 @@ int main( int, char** ) {
 	DEBUG_MSG("Starting parallel map work"); 
 	auto output = Parallel::Map(work.begin(), work.end(), doWork);
 	chrono::steady_clock::time_point t5 = chrono::steady_clock::now();
-	DEBUG_MSG("Starting parallel for chunked work");
-	Parallel::ForChunking(start, end, work, doWork);
+	DEBUG_MSG("Starting parallel foreach chunked work");
+	Parallel::ForeachChunking(work.begin(), work.end(), doWork);
 	chrono::steady_clock::time_point t6 = chrono::steady_clock::now();
 	chrono::duration<double> ElapsedSerial = chrono::duration_cast<chrono::duration<double>>(t2-t1);
 	chrono::duration<double> ElapsedParallelForEach = chrono::duration_cast<chrono::duration<double>>(t3-t2);
