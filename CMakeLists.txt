@@ -8,7 +8,7 @@ ADD_CUSTOM_TARGET(Profile
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
   COMMENT "Switch CMAKE_BUILD_TYPE to Profile"
   )
-set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS} -g3 -ggdb -O0 -pg -Wall -Wextra -Wno-unused --std=c++1y")
+set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS} -g3 -ggdb -O0 -Wall -Wextra -Wno-unused --std=c++1y")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g3 -ggdb -O0 -Wall -Wextra -Wno-unused --std=c++1y")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused --std=c++1y")
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
