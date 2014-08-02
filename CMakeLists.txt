@@ -8,7 +8,7 @@ ADD_CUSTOM_TARGET(Profile
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
   COMMENT "Switch CMAKE_BUILD_TYPE to Profile"
   )
-set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS} -g3 -ggdb -O0 -pg -Wall -Wextra -Wno-unused --std=c++1y")
+set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS} -g3 -ggdb -O0 -Wall -Wextra -Wno-unused --std=c++1y")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g3 -ggdb -O0 -Wall -Wextra -Wno-unused --std=c++1y")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused --std=c++1y")
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -18,3 +18,5 @@ find_library(cryptopp SHARED /usr/lib/libcryptopp.so)
 find_library(pthread SHARED /usr/lib/libpthread.so.0)
 add_executable(TestProgram.exe TestProgram.cpp)
 target_link_libraries(TestProgram.exe cryptopp pthread)
+add_executable(TestProgramForChunking.exe TestProgramForChunking.cpp)
+target_link_libraries(TestProgramForChunking.exe cryptopp pthread)
