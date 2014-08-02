@@ -38,6 +38,9 @@ int main( int, char** ) {
 	}
 	auto start = work.begin();
 	auto end = work.end();
+	chrono::steady_clock::time_point t0 = chrono::steady_clock::now();
+	DEBUG_MSG("Foreach with no chunking");
+	Parallel::Foreach(start, end, doWork);
 	chrono::steady_clock::time_point t1 = chrono::steady_clock::now();
 	DEBUG_MSG("ForeachChunking with grainSize 1");
 	Parallel::ForeachChunking(start, end, doWork, 1);
@@ -64,6 +67,7 @@ int main( int, char** ) {
 	Parallel::ForeachChunking(start, end, doWork, 8);
 	chrono::steady_clock::time_point t9 = chrono::steady_clock::now();
 	vector<chrono::duration<double>> Times;
+	Times.push_back(chrono::duration_cast<chrono::duration<double>>(t1-t0));
 	Times.push_back(chrono::duration_cast<chrono::duration<double>>(t2-t1));	
 	Times.push_back(chrono::duration_cast<chrono::duration<double>>(t3-t2));
 	Times.push_back(chrono::duration_cast<chrono::duration<double>>(t4-t3));

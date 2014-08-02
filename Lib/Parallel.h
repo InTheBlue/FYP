@@ -263,27 +263,31 @@ namespace Parallel
 				{
 					std::deque<std::function<void()>> work;
 					std::function<void()> f;
-					if(work.empty() && joinWhenEmpty)
+					if(Tasks.empty() && joinWhenEmpty)
 					{
 						return;
 					}
-					if(!work.empty())
+					else
 					{
-						f = work.front();
-						work.pop_front();
-					}
-					try
-					{
-						if(f)
+						work = Tasks.PopFront();
+						while(!work.empty())
 						{
-							f();
+							f = work.front();
+							work.pop_front();
+							try
+							{
+								if(f)
+								{
+									f();
+								}
+							}
+							catch(std::exception& e)
+							{
+								OutputMutex.lock();
+								cerr<<e.what()<<endl;
+								OutputMutex.unlock();
+							}
 						}
-					}
-					catch(std::exception& e)
-					{
-						OutputMutex.lock();
-						cerr<<e.what()<<endl;
-						OutputMutex.unlock();
 					}
 				}
 			}));
