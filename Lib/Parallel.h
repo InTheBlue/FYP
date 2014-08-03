@@ -269,7 +269,7 @@ namespace Parallel
 					}
 					else
 					{
-						work = Tasks.PopFront();
+						work = Tasks.TryPopFront();
 						while(!work.empty())
 						{
 							f = work.front();
