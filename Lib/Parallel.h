@@ -18,7 +18,7 @@ namespace Parallel
 	void For(IndexType Start, IndexType End, const Container Input, Func F)
 	{
 		std::vector<std::thread> Workers;
-		concurrent_deque<std::function<void()>> Tasks;
+		concurrent_deque<typename Container::value_type> Tasks;
 		std::mutex OutputMutex;
 		size_t ThreadCount = std::thread::hardware_concurrency();
 		std::atomic<bool> joinWhenEmpty(false);
@@ -30,37 +30,30 @@ namespace Parallel
 		}
 		for(;Start < End; Start++)
 		{
-			auto in = Input[Start];
-			Tasks.PushBack([=]{
-				F(in);
-			});
+			Tasks.PushBack(Input[Start]);
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
 			Workers.push_back(std::thread([&]{
 				while(true)
 				{
-					std::function<void()> f;
 					if(Tasks.Empty() && joinWhenEmpty)
 					{
 						return;
 					}
 					if(!Tasks.Empty())
 					{
-						f = Tasks.TryPopFront();
-					}
-					try
-					{
-						if(f)
+						auto task = Tasks.TryPopFront();
+						try
 						{
-							f();
+							F(task);
 						}
-					}
-					catch(std::exception& e)
-					{
-						OutputMutex.lock();
-						cerr<<e.what()<<endl;
-						OutputMutex.unlock();
+						catch(std::exception& e)
+						{
+							OutputMutex.lock();
+							cerr<<e.what()<<endl;
+							OutputMutex.unlock();
+						}
 					}
 				}
 			}));
@@ -76,7 +69,7 @@ namespace Parallel
 	void Foreach(Iterator Start, Iterator End, Func F)
 	{
 		std::vector<std::thread> Workers;
-		concurrent_deque<std::function<void()>> Tasks;
+		concurrent_deque<typename Iterator::value_type> Tasks;
 		std::atomic<bool> joinWhenEmpty(false);
 		std::mutex OutputMutex;
 		size_t ThreadCount = std::thread::hardware_concurrency();
@@ -88,34 +81,30 @@ namespace Parallel
 		}
 		for(;Start != End; Start++)
 		{
-			Tasks.PushBack([F, Start]{F(*Start);});
+			Tasks.PushBack(*Start);
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
 			Workers.push_back(std::thread([&]{
 				while(true)
 				{
-					std::function<void()> f;
 					if(Tasks.Empty() && joinWhenEmpty)
 					{
 						return;
 					}
 					if(!Tasks.Empty())
 					{
-						f = Tasks.TryPopFront();
-					}
-					try
-					{
-						if(f)
+						auto task = Tasks.TryPopFront();
+						try
 						{
-							f();
+							F(task);
 						}
-					}
-					catch(std::exception& e)
-					{
-						OutputMutex.lock();
-						cerr<<e.what()<<endl;
-						OutputMutex.unlock();
+						catch(std::exception& e)
+						{
+							OutputMutex.lock();
+							cerr<<e.what()<<endl;
+							OutputMutex.unlock();
+						}
 					}
 				}
 			}));
@@ -132,7 +121,7 @@ namespace Parallel
 	    -> concurrent_map<typename Iter::value_type, decltype(F(*Start))>
 	{
 		std::vector<std::thread> Workers;
-		concurrent_deque<std::function<void()>> Tasks;
+		concurrent_deque<typename Iter::value_type> Tasks;
 		std::atomic<bool> joinWhenEmpty(false);
 		std::mutex OutputMutex;
 		size_t ThreadCount = std::thread::hardware_concurrency();
@@ -148,7 +137,7 @@ namespace Parallel
 		}
 		for(;Start != End; Start++)
 		{
-			Tasks.PushBack([F, Start, &Output]{Output.SetItem(*Start, F(*Start));});
+			Tasks.PushBack(*Start);
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
@@ -161,13 +150,10 @@ namespace Parallel
 					}
 					if(!Tasks.Empty())
 					{
-						auto f = Tasks.TryPopFront();
+						auto task = Tasks.TryPopFront();
 						try
 						{
-							if(f)
-							{
-								f();
-							}
+							Output.SetItem(task, F(task));
 						}
 						catch(std::exception& e)
 						{
@@ -229,7 +215,7 @@ namespace Parallel
 	void ForeachChunking(Iterator Start, Iterator End, Func F, size_t grainSize = 4)
 	{
 		std::vector<std::thread> Workers;
-		concurrent_deque<std::deque<std::function<void()>>> Tasks;
+		concurrent_deque<std::deque<typename Iterator::value_type>> Tasks;
 		std::atomic<bool> joinWhenEmpty(false);
 		std::mutex OutputMutex;
 		size_t ThreadCount = std::thread::hardware_concurrency();
@@ -244,10 +230,10 @@ namespace Parallel
 		auto chunks = chunk(Start, End, numOfChunks);
 		for(auto chunkit = chunks.begin(); chunkit != chunks.end(); chunkit++)
 		{
-			std::deque<std::function<void()>> d;
+			std::deque<typename Iterator::value_type> d;
 			for(auto it = (*chunkit).first;it != (*chunkit).second; it++)
 			{
-				d.push_back([=]{F(*it);});
+				d.push_back(*it);
 			}
 			Tasks.PushBack(d);
 		}
@@ -259,8 +245,7 @@ namespace Parallel
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
 			Workers.push_back(std::thread([&]{
-				std::deque<std::function<void()>> work;
-				std::function<void()> f;
+				std::deque<typename Iterator::value_type> work;
 				while(true)
 				{
 					if(Tasks.Empty() && joinWhenEmpty)
@@ -272,14 +257,11 @@ namespace Parallel
 						work = Tasks.TryPopFront();
 						while(!work.empty())
 						{
-							f = work.front();
+							auto task = work.front();
 							work.pop_front();
 							try
 							{
-								if(f)
-								{
-									f();
-								}
+								F(task);
 							}
 							catch(std::exception& e)
 							{
