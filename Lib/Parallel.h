@@ -31,9 +31,9 @@ namespace Parallel
 		for(;Start < End; Start++)
 		{
 			auto in = Input[Start];
-			Tasks.PushBack([=]{
+			Tasks.PushBack(std::move([=]{
 				F(in);
-			});
+			}));
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
@@ -88,7 +88,7 @@ namespace Parallel
 		}
 		for(;Start != End; Start++)
 		{
-			Tasks.PushBack([F, Start]{F(*Start);});
+			Tasks.PushBack(std::move([F, Start]{F(*Start);}));
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
@@ -148,7 +148,7 @@ namespace Parallel
 		}
 		for(;Start != End; Start++)
 		{
-			Tasks.PushBack([F, Start, &Output]{Output.SetItem(*Start, F(*Start));});
+			Tasks.PushBack(std::move([F, Start, &Output]{Output.SetItem(*Start, F(*Start));}));
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
