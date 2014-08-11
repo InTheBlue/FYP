@@ -28,13 +28,6 @@ namespace Parallel
 		{
 			ThreadCount = 1;
 		}
-		for(;Start < End; Start++)
-		{
-			auto in = Input[Start];
-			Tasks.PushBack([=]{
-				F(in);
-			});
-		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
 			Workers.push_back(std::thread([&]{
@@ -64,6 +57,13 @@ namespace Parallel
 					}
 				}
 			}));
+		}
+		for(;Start < End; Start++)
+		{
+			auto in = Input[Start];
+			Tasks.PushBack([=]{
+				F(in);
+			});
 		}
 		joinWhenEmpty = true;
 		for(auto it = Workers.begin(); it != Workers.end(); it++)
@@ -86,10 +86,6 @@ namespace Parallel
 		{
 			ThreadCount = 1;
 		}
-		for(;Start != End; Start++)
-		{
-			Tasks.PushBack([F, Start]{F(*Start);});
-		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
 			Workers.push_back(std::thread([&]{
@@ -119,6 +115,10 @@ namespace Parallel
 					}
 				}
 			}));
+		}
+		for(;Start != End; Start++)
+		{
+			Tasks.PushBack([F, Start]{F(*Start);});
 		}
 		joinWhenEmpty = true;
 		for(auto it = Workers.begin(); it != Workers.end(); it++)
@@ -145,10 +145,6 @@ namespace Parallel
 		if(ThreadCount == 0)
 		{
 			ThreadCount = 1;
-		}
-		for(;Start != End; Start++)
-		{
-			Tasks.PushBack([F, Start, &Output]{Output.SetItem(*Start, F(*Start));});
 		}
 		for(size_t i = 0; i < ThreadCount; i++)
 		{
@@ -178,6 +174,10 @@ namespace Parallel
 					}
 				}
 			}));
+		}
+		for(;Start != End; Start++)
+		{
+			Tasks.PushBack([F, Start, &Output]{Output.SetItem(*Start, F(*Start));});
 		}
 		joinWhenEmpty = true;
 		for(auto it = Workers.begin(); it != Workers.end(); it++)
